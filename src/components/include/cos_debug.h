@@ -37,8 +37,7 @@ static volatile int *volatile_null_ptr = (int *) NULL;
 __attribute__((noreturn)) static inline void
 __cos_noret(void)
 {
-	while (1)
-		;
+	while (1);
 }
 
 #ifndef SPIN

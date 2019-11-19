@@ -28,14 +28,13 @@ cos_init(void)
 
 	if (first_init) {
 		first_init = 0;
-		cos_meminfo_init(&booter_info.mi, BOOT_MEM_KM_BASE, COS_MEM_KERN_PA_SZ, BOOT_CAPTBL_SELF_UNTYPED_PT);
+		/* Where is the untyped memory (PA), how big is it, and what is the cap to it? */
+		cos_meminfo_init(&booter_info.mi, BOOT_MEM_KM_BASE, 0x20000000 /* COS_MEM_KERN_PA_SZ */, BOOT_CAPTBL_SELF_UNTYPED_PT);
+		/* The pointers to ourselves */
 		cos_compinfo_init(&booter_info, BOOT_CAPTBL_SELF_PT, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_COMP,
 				(vaddr_t)cos_get_heap_ptr(), BOOT_CAPTBL_FREE, &booter_info);
 		init_done = 1;
-
 	}
-
-	cos_retype_all_superpages(&booter_info);
 
 	while (!init_done) ;
 

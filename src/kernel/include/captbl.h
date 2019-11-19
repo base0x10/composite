@@ -15,7 +15,7 @@
 #include "shared/cos_types.h"
 #include "ertrie.h"
 #include "liveness_tbl.h"
-#include "shared/util.h"
+#include "chal/shared/util.h"
 
 #ifndef CACHELINE_SIZE
 #define CACHELINE_SIZE 64
