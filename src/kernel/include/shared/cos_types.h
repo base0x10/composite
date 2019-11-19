@@ -341,6 +341,8 @@ enum
 
 #ifndef __arm__
 #define COS_SYSCALL __attribute__((regparm(0)))
+#else
+#define COS_SYSCALL
 #endif
 
 #ifndef NULL
