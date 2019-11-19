@@ -339,7 +339,9 @@ enum
 #define PERCPU_GET(name) (&(name[GET_CURR_CPU].name))
 #define PERCPU_GET_TARGET(name, target) (&(name[target].name))
 
+#ifndef __arm__
 #define COS_SYSCALL __attribute__((regparm(0)))
+#endif
 
 #ifndef NULL
 #define NULL ((void *)0)
