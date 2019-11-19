@@ -1,13 +1,11 @@
-include Makefile.src
-
-CC := gcc -m32
-LD := ld -m elf_i386
-AS := as --32 -g
+CC := clang -c -target armv7a-unknown-none-elf -mtune=cortex-a9
+LD := ld.lld -v -m armelf
+AS := clang -fuse-ld=lld -target armv7a-unknown-none-elf -mtune=cortex-a9
 
 INCPATH := ../../kernel/include
 INCS    := -I$(INCPATH)
-CFLAGS  := -g3 -O3 -ffreestanding -Wno-unused-function -Wno-unused-variable -Wno-unused-but-set-variable -nostdinc -nostdlib -fno-pic -mno-red-zone $(INCS)
-LDFLAGS := -nostdlib -fno-builtin -nostartfiles -nostdinc -nodefaultlibs
+CFLAGS  := -g3 -O3 -ffreestanding -Wno-unused-function -Wno-unused-variable -Wno-unused-but-set-variable -fno-pic $(INCS)
+LDFLAGS := -nostdlib -nostdinc -rtlib=compiler-rt
 
 KERNEL := kernel.img
 
@@ -30,24 +28,27 @@ WARNINGS += -Wwrite-strings
 CFLAGS += $(WARNINGS)
 
 OBJS += kernel.o
-OBJS += gdt.o
-OBJS += idt.o
+#OBJS += gdt.o
+#OBJS += idt.o
 OBJS += vm.o
 OBJS += printk.o
 OBJS += string.o
-OBJS += vtxprintf.o
-OBJS += tss.o
+#OBJS += vtxprintf.o
+##OBJS += tss.o
 OBJS += user.o
 OBJS += serial.o
-OBJS += hpet.o
+#OBJS += hpet.o
 OBJS += chal.o
 OBJS += boot_comp.o
-OBJS += miniacpi.o
+#OBJS += miniacpi.o
 #OBJS += console.o
-OBJS += vga.o
-OBJS += exception.o
+#OBJS += vga.o
+#OBJS += exception.o
 OBJS += lapic.o
 OBJS += chal_pgtbl.o
+OBJS += irq.o
+# OBJS += start.o
+OBJS += vtxprintf.o 
 
 COS_OBJ += pgtbl.o
 COS_OBJ += retype_tbl.o
@@ -62,14 +63,12 @@ OBJS += $(COS_OBJ)
 
 all: $(KERNEL)
 
-$(KERNEL): linker.ld $(DEPS) $(OBJS) loader.o
-	$(info |     [LD]   Linking $@)
-	@$(LD) -T linker.ld loader.o entry.o $(OBJS) -o $@
+start.o: start.S
+	$(AS) -c start.S -o $@
 
-loader.o: loader.S entry.S
-	$(info |     [AS]   Assembling $@)
-	@$(CC) -c -I$(INCPATH) entry.S
-	@$(CC) -c -I$(INCPATH) loader.S
+$(KERNEL): linker.ld $(DEPS) $(OBJS) start.o
+	$(info |     [LD]   Linking $@)
+	@$(LD) -T linker.ld $(OBJS) start.o -o $@
 
 %.d: %.c
 	@$(CC) -M -MT $(patsubst %.d, %.o, $@) $(CFLAGS) $(LDFLAGS) $< -o $@
