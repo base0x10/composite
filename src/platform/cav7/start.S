@@ -1,6 +1,5 @@
 /* the assembly part for cortex-a7 */
     .section            .text
-    .syntax             divided
     .code               32
     .align              16
 
