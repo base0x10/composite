@@ -170,9 +170,7 @@ sl_cs_enter_nospin(void)
 	csi.v    = sl__globals_cpu()->lock.u.v;
 	cached.v = csi.v;
 
-	if (unlikely(csi.s.owner)) {
-		return sl_cs_enter_contention(&csi, &cached, sl_thd_thdcap(t), tok);
-	}
+	if (unlikely(csi.s.owner)) { return sl_cs_enter_contention(&csi, &cached, sl_thd_thdcap(t), tok); }
 
 	csi.s.owner = sl_thd_thdcap(t);
 	if (!ps_cas(&sl__globals_cpu()->lock.u.v, cached.v, csi.v)) return 1;
@@ -259,36 +257,40 @@ unsigned int sl_thd_block_periodic(thdid_t tid);
 /*
  * block the thread for it's tcap expiry until next period if it's a thread with it's own tcap..
  */
-void         sl_thd_block_expiry(struct sl_thd *t);
-int          sl_thd_block_no_cs(struct sl_thd *t, sl_thd_state_t block_type, cycles_t abs_timeout);
-int          sl_thd_sched_block_no_cs(struct sl_thd *t, sl_thd_state_t block_type, cycles_t abs_timeout);
+void sl_thd_block_expiry(struct sl_thd *t);
+int  sl_thd_block_no_cs(struct sl_thd *t, sl_thd_state_t block_type, cycles_t abs_timeout);
+int  sl_thd_sched_block_no_cs(struct sl_thd *t, sl_thd_state_t block_type, cycles_t abs_timeout);
 
 /* wakeup a thread that has (or soon will) block */
 void sl_thd_wakeup(thdid_t tid);
 int  sl_thd_wakeup_no_cs(struct sl_thd *t);
 int  sl_thd_sched_wakeup_no_cs(struct sl_thd *t);
 /* wakeup thread and do not remove from timeout queue if blocked on timeout */
-int  sl_thd_wakeup_no_cs_rm(struct sl_thd *t);
+int sl_thd_wakeup_no_cs_rm(struct sl_thd *t);
 
 void sl_thd_yield(thdid_t tid);
 void sl_thd_yield_cs_exit(thdid_t tid);
 
 /* The entire thread allocation and free API */
 struct sl_thd *sl_thd_alloc(cos_thd_fn_t fn, void *data);
-struct sl_thd *sl_thd_aep_alloc(cos_aepthd_fn_t fn, void *data, int own_tcap, cos_channelkey_t key, microsec_t ipiwin, u32_t ipimax);
+struct sl_thd *
+sl_thd_aep_alloc(cos_aepthd_fn_t fn, void *data, int own_tcap, cos_channelkey_t key, microsec_t ipiwin, u32_t ipimax);
 /*
  * This API creates a sl_thd object for this child component.
  * @comp: component created using cos_defkernel_api which includes initthd (with/without its own tcap & rcvcap).
  */
 struct sl_thd *sl_thd_comp_init(struct cos_defcompinfo *comp, int is_sched);
 
-struct sl_thd *sl_thd_initaep_alloc(struct cos_defcompinfo *comp, struct sl_thd *sched_thd, int is_sched, int own_tcap, cos_channelkey_t key, microsec_t ipiwin, u32_t ipimax);
-struct sl_thd *sl_thd_aep_alloc_ext(struct cos_defcompinfo *comp, struct sl_thd *sched_thd, thdclosure_index_t idx, int is_aep, int own_tcap, cos_channelkey_t key, microsec_t ipiwin, u32_t ipimax, arcvcap_t *extrcv);
+struct sl_thd *sl_thd_initaep_alloc(struct cos_defcompinfo *comp, struct sl_thd *sched_thd, int is_sched, int own_tcap,
+                                    cos_channelkey_t key, microsec_t ipiwin, u32_t ipimax);
+struct sl_thd *
+sl_thd_aep_alloc_ext(struct cos_defcompinfo *comp, struct sl_thd *sched_thd, thdclosure_index_t idx, int is_aep,
+                     int own_tcap, cos_channelkey_t key, microsec_t ipiwin, u32_t ipimax, arcvcap_t *extrcv);
 
 struct sl_thd *sl_thd_init_ext(struct cos_aep_info *aep, struct sl_thd *sched_thd);
 
-void           sl_thd_free(struct sl_thd *t);
-void           sl_thd_exit();
+void sl_thd_free(struct sl_thd *t);
+void sl_thd_exit();
 
 void sl_thd_param_set(struct sl_thd *t, sched_param_t sp);
 
@@ -399,18 +401,17 @@ static inline int
 sl_thd_activate(struct sl_thd *t, sched_tok_t tok)
 {
 	struct cos_defcompinfo *dci = cos_defcompinfo_curr_get();
-	struct cos_compinfo    *ci  = &dci->ci;
-	struct sl_global_cpu   *g   = sl__globals_cpu();
-	int ret = 0;
+	struct cos_compinfo *   ci  = &dci->ci;
+	struct sl_global_cpu *  g   = sl__globals_cpu();
+	int                     ret = 0;
 
 	if (t->properties & SL_THD_PROPERTY_SEND) {
 		return cos_sched_asnd(t->sndcap, g->timeout_next, g->sched_rcv, tok);
 	} else if (t->properties & SL_THD_PROPERTY_OWN_TCAP) {
-		return cos_switch(sl_thd_thdcap(t), sl_thd_tcap(t), t->prio,
-				  g->timeout_next, g->sched_rcv, tok);
+		return cos_switch(sl_thd_thdcap(t), sl_thd_tcap(t), t->prio, g->timeout_next, g->sched_rcv, tok);
 	} else {
-		ret = cos_defswitch(sl_thd_thdcap(t), t->prio, t == g->sched_thd ?
-				    TCAP_TIME_NIL : g->timeout_next, tok);
+		ret = cos_defswitch(sl_thd_thdcap(t), t->prio, t == g->sched_thd ? TCAP_TIME_NIL : g->timeout_next,
+		                    tok);
 		if (likely(t != g->sched_thd && t != g->idle_thd)) return ret;
 		if (unlikely(ret != -EPERM)) return ret;
 
@@ -450,10 +451,10 @@ static inline int
 sl_cs_exit_schedule_nospin_arg(struct sl_thd *to)
 {
 	struct cos_defcompinfo *dci = cos_defcompinfo_curr_get();
-	struct cos_compinfo    *ci = &dci->ci;
-	struct sl_thd_policy   *pt;
+	struct cos_compinfo *   ci  = &dci->ci;
+	struct sl_thd_policy *  pt;
 	struct sl_thd *         t;
-	struct sl_global_cpu   *globals = sl__globals_cpu();
+	struct sl_global_cpu *  globals = sl__globals_cpu();
 	sched_tok_t             tok;
 	cycles_t                now;
 	s64_t                   offset;
@@ -493,15 +494,16 @@ sl_cs_exit_schedule_nospin_arg(struct sl_thd *to)
 
 		if (t->last_replenish == 0 || t->last_replenish + t->period <= now) {
 			tcap_res_t currbudget = 0;
-			cycles_t replenish    = now - ((now - t->last_replenish) % t->period);
+			cycles_t   replenish  = now - ((now - t->last_replenish) % t->period);
 
-			ret = 0;
+			ret        = 0;
 			currbudget = (tcap_res_t)cos_introspect(ci, sl_thd_tcap(t), TCAP_GET_BUDGET);
 
 			if (!cycles_same(currbudget, t->budget, SL_CYCS_DIFF) && currbudget < t->budget) {
 				tcap_res_t transfer = t->budget - currbudget;
 
-				/* tcap_transfer will assign sched_tcap's prio to t's tcap if t->prio == 0, which we don't want. */
+				/* tcap_transfer will assign sched_tcap's prio to t's tcap if t->prio == 0, which we
+				 * don't want. */
 				assert(t->prio >= TCAP_PRIO_MAX && t->prio <= TCAP_PRIO_MIN);
 				ret = cos_tcap_transfer(sl_thd_rcvcap(t), globals->sched_tcap, transfer, t->prio);
 			}
@@ -552,9 +554,7 @@ sl_cs_exit_switchto(struct sl_thd *to)
 	 * case that the caller has to consider if the current thread
 	 * has a higher priority than the "to" thread.
 	 */
-	if (sl_cs_exit_schedule_nospin_arg(to)) {
-		sl_cs_exit_schedule();
-	}
+	if (sl_cs_exit_schedule_nospin_arg(to)) { sl_cs_exit_schedule(); }
 }
 
 /*

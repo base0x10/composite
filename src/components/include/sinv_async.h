@@ -14,9 +14,9 @@
 
 #define SINV_NUM_MAX 16
 #define SINV_INIT_NPAGES 1
-#define SINV_REQ_NPAGES  1
+#define SINV_REQ_NPAGES 1
 
-#define SINV_REQ_SET   1
+#define SINV_REQ_SET 1
 #define SINV_REQ_RESET 0
 
 /*
@@ -41,8 +41,8 @@ typedef int (*sinv_rets_fn_t)(word_t *r2, word_t *r3, word_t a, word_t b, word_t
 
 struct sinv_call_req {
 	sinv_num_t callno;
-	word_t arg1, arg2, arg3; /* by client */
-	word_t ret2, ret3; /* by server */
+	word_t     arg1, arg2, arg3; /* by client */
+	word_t     ret2, ret3;       /* by server */
 };
 
 struct sinv_thdcrt_req {
@@ -56,8 +56,8 @@ struct sinv_thdinfo {
 	cos_channelkey_t rkey;
 	cos_channelkey_t skey;
 
-	spdid_t clientid;
-	vaddr_t shmaddr;
+	spdid_t   clientid;
+	vaddr_t   shmaddr;
 	asndcap_t sndcap;
 	arcvcap_t rcvcap;
 } CACHE_ALIGNED;
@@ -66,8 +66,9 @@ struct sinv_client {
 	struct sinv_thdinfo cthds[MAX_NUM_THREADS];
 };
 
-typedef enum {
-	SINV_FN = 0,
+typedef enum
+{
+	SINV_FN      = 0,
 	SINV_RETS_FN = 1,
 } sinv_fn_type_t;
 
@@ -113,8 +114,9 @@ void sinv_client_init(struct sinv_async_info *s, cos_channelkey_t shm_key);
  * @rcvkey == 0, thread is AEP thread, cannot "cos_asnd" on return.
  * @shm_snd_key, key used for shared memory (created by the client) and for "cos_asnd" from client to the server.
  *               therefore, the server thread should create AEP using this key!
-*/
-int sinv_client_thread_init(struct sinv_async_info *s, thdid_t tid, cos_channelkey_t rcvkey, cos_channelkey_t shm_snd_key);
+ */
+int
+    sinv_client_thread_init(struct sinv_async_info *s, thdid_t tid, cos_channelkey_t rcvkey, cos_channelkey_t shm_snd_key);
 int sinv_client_call(struct sinv_async_info *s, sinv_num_t, word_t a, word_t b, word_t c);
 int sinv_client_rets_call(struct sinv_async_info *s, sinv_num_t, word_t *r2, word_t *r3, word_t a, word_t b, word_t c);
 
@@ -122,7 +124,9 @@ int sinv_client_rets_call(struct sinv_async_info *s, sinv_num_t, word_t *r2, wor
 typedef sinv_num_t acom_type_t;
 /* @shm_key - client to make "thread" creation requests for server side. (polling only & 1 req at a time) */
 void acom_client_init(struct sinv_async_info *s, cos_channelkey_t shm_key);
-int acom_client_thread_init(struct sinv_async_info *s, thdid_t, arcvcap_t, cos_channelkey_t rkey, cos_channelkey_t skey);
-int acom_client_request(struct sinv_async_info *s, acom_type_t t, word_t a, word_t b, word_t c, tcap_res_t budget, tcap_prio_t prio);
+int
+    acom_client_thread_init(struct sinv_async_info *s, thdid_t, arcvcap_t, cos_channelkey_t rkey, cos_channelkey_t skey);
+int acom_client_request(struct sinv_async_info *s, acom_type_t t, word_t a, word_t b, word_t c, tcap_res_t budget,
+                        tcap_prio_t prio);
 
 #endif /* SINV_ASYNC_H */

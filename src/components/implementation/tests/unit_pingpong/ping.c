@@ -4,7 +4,8 @@
 #include <cobj_format.h>
 #include <hypercall.h>
 
-void cos_init(void)
+void
+cos_init(void)
 {
 	int r1 = 0, r2 = 0;
 	int a = 1, b = 2, c = 3, d = 4;

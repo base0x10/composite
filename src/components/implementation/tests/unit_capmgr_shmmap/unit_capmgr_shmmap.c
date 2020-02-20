@@ -21,11 +21,7 @@ static cycles_t cycs_per_usec;
 #define TEST_STR_NUM 5
 
 char *test_strs[TEST_STR_NUM] = {
-	"Hello",
-	"Welcome",
-	"Hi",
-	"Howdy",
-	"Goodbye",
+  "Hello", "Welcome", "Hi", "Howdy", "Goodbye",
 };
 
 static int
@@ -34,8 +30,8 @@ test_mem_readwrite(vaddr_t addr, unsigned int size)
 	unsigned int i;
 
 	for (i = 0; i < size; i++) {
-		vaddr_t page = addr + i * PAGE_SIZE;
-		const char *str = test_strs[i % TEST_STR_NUM];
+		vaddr_t     page = addr + i * PAGE_SIZE;
+		const char *str  = test_strs[i % TEST_STR_NUM];
 
 		memset((void *)page, 0, TEST_STR_MAX_LEN + 1);
 		strcpy((char *)page, str);
@@ -49,10 +45,10 @@ test_mem_readwrite(vaddr_t addr, unsigned int size)
 static void
 test_shmem(void)
 {
-	cbuf_t id = 1;
+	cbuf_t        id     = 1;
 	unsigned long npages = 0, npages2 = 0;
-	vaddr_t addr, addr2;
-	int failure = 0;
+	vaddr_t       addr, addr2;
+	int           failure = 0;
 
 	npages = memmgr_shared_page_map(id, &addr);
 	/* know that other comp created this before me. */
@@ -68,10 +64,10 @@ test_shmem(void)
 static void
 test_shmem_channel(void)
 {
-	cbuf_t id, id2;
+	cbuf_t        id, id2;
 	unsigned long npages = 0, npages2 = 0;
-	vaddr_t addr, addr2;
-	int failure = 0;
+	vaddr_t       addr, addr2;
+	int           failure = 0;
 
 	id = channel_shared_page_map(SHMCHANNEL_KEY, &addr, &npages);
 	/* know that other comp created this before me. */
@@ -85,7 +81,7 @@ test_shmem_channel(void)
 void
 cos_init(void)
 {
-	spdid_t child;
+	spdid_t     child;
 	comp_flag_t childflag;
 
 	assert(hypercall_comp_child_next(cos_spd_id(), &child, &childflag) == -1);

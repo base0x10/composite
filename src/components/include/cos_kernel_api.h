@@ -76,7 +76,8 @@ struct cos_compinfo {
 	struct cos_compinfo *memsrc; /* might be self-referential */
 	struct cos_meminfo   mi;     /* only populated for the component with real memory */
 
-	struct ps_lock cap_lock, mem_lock; /* locks to make the cap frontier and mem frontier updates and expands atomic */
+	struct ps_lock cap_lock,
+	  mem_lock;             /* locks to make the cap frontier and mem frontier updates and expands atomic */
 	struct ps_lock va_lock; /* lock to make the vas frontier and bump expands for vas atomic */
 };
 
@@ -155,7 +156,8 @@ int cos_asnd(asndcap_t snd, int yield);
 /* returns non-zero if there are still pending events (i.e. there have been pending snds) */
 int cos_rcv(arcvcap_t rcv, rcv_flags_t flags, int *rcvd);
 /* returns the same value as cos_rcv, but also information about scheduling events */
-int cos_sched_rcv(arcvcap_t rcv, rcv_flags_t flags, tcap_time_t timeout, int *rcvd, thdid_t *thdid, int *blocked, cycles_t *cycles, tcap_time_t *thd_timeout);
+int cos_sched_rcv(arcvcap_t rcv, rcv_flags_t flags, tcap_time_t timeout, int *rcvd, thdid_t *thdid, int *blocked,
+                  cycles_t *cycles, tcap_time_t *thd_timeout);
 
 int cos_introspect(struct cos_compinfo *ci, capid_t cap, unsigned long op);
 
@@ -190,14 +192,14 @@ int cos_tcap_merge(tcap_t dst, tcap_t rm);
 hwcap_t cos_hw_alloc(struct cos_compinfo *ci, u32_t bitmap);
 int     cos_hw_attach(hwcap_t hwc, hwid_t hwid, arcvcap_t rcvcap);
 int     cos_hw_detach(hwcap_t hwc, hwid_t hwid);
-void   *cos_hw_map(struct cos_compinfo *ci, hwcap_t hwc, paddr_t pa, unsigned int len);
+void *  cos_hw_map(struct cos_compinfo *ci, hwcap_t hwc, paddr_t pa, unsigned int len);
 int     cos_hw_cycles_per_usec(hwcap_t hwc);
 int     cos_hw_cycles_thresh(hwcap_t hwc);
-int	cos_hw_tlb_lockdown(hwcap_t hwc, unsigned long entryid, unsigned long vaddr, unsigned long paddr);
-int	cos_hw_l1flush(hwcap_t hwc);
-int	cos_hw_tlbflush(hwcap_t hwc);
-int	cos_hw_tlbstall(hwcap_t hwc);
-int	cos_hw_tlbstall_recount(hwcap_t hwc);
+int     cos_hw_tlb_lockdown(hwcap_t hwc, unsigned long entryid, unsigned long vaddr, unsigned long paddr);
+int     cos_hw_l1flush(hwcap_t hwc);
+int     cos_hw_tlbflush(hwcap_t hwc);
+int     cos_hw_tlbstall(hwcap_t hwc);
+int     cos_hw_tlbstall_recount(hwcap_t hwc);
 
 capid_t cos_capid_bump_alloc(struct cos_compinfo *ci, cap_t cap);
 

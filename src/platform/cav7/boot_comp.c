@@ -14,7 +14,7 @@
 
 extern u8_t *boot_comp_pgd;
 
-void *thd_mem[NUM_CPU], *tcap_mem[NUM_CPU];
+void *         thd_mem[NUM_CPU], *tcap_mem[NUM_CPU];
 struct captbl *glb_boot_ct;
 
 int
@@ -25,7 +25,7 @@ boot_nptes(unsigned int sz)
 
 unsigned long boot_sram_heap = 0x80001000;
 
-u8_t*
+u8_t *
 sram_boot_alloc(int npages)
 {
 	u8_t *        r = boot_sram_heap;
@@ -34,8 +34,7 @@ sram_boot_alloc(int npages)
 	boot_sram_heap += npages * (PAGE_SIZE / sizeof(u8_t));
 	for (i = (unsigned long)r; i < (unsigned long)boot_sram_heap; i += PAGE_SIZE) {
 		if ((unsigned long)i % RETYPE_MEM_NPAGES == 0) {
-			if (retypetbl_retype2kern((void *)chal_va2pa((void *)i), PAGE_ORDER)) {
-			}
+			if (retypetbl_retype2kern((void *)chal_va2pa((void *)i), PAGE_ORDER)) {}
 		}
 	}
 
@@ -44,7 +43,7 @@ sram_boot_alloc(int npages)
 	return r;
 }
 
-u8_t*
+u8_t *
 sram_uvm_alloc(int npages)
 {
 	u8_t *        r = boot_sram_heap;
@@ -53,8 +52,7 @@ sram_uvm_alloc(int npages)
 	boot_sram_heap += npages * (PAGE_SIZE / sizeof(u8_t));
 	for (i = (unsigned long)r; i < (unsigned long)boot_sram_heap; i += PAGE_SIZE) {
 		if ((unsigned long)i % RETYPE_MEM_NPAGES == 0) {
-			if (retypetbl_retype2user((void *)chal_va2pa((void *)i), PAGE_ORDER)) {
-			}
+			if (retypetbl_retype2user((void *)chal_va2pa((void *)i), PAGE_ORDER)) {}
 		}
 	}
 
@@ -81,9 +79,9 @@ boot_pgtbl_mappings_add(struct captbl *ct, capid_t pgdcap, capid_t ptecap, const
 
 	/* No superpage support is implemented for Cortex-A */
 	nsmalls = range / PAGE_SIZE;
-	nptes = nsmalls / 256 + 1;
+	nptes   = nsmalls / 256 + 1;
 
-	ptes  = mem_boot_alloc(nptes);
+	ptes = mem_boot_alloc(nptes);
 	assert(ptes);
 
 	printk("\tCreating %d %s PTEs for PGD @ 0x%x from [%x,%x) to [%x,%x).\n", nptes, label,
@@ -128,10 +126,10 @@ boot_pgtbl_mappings_add(struct captbl *ct, capid_t pgdcap, capid_t ptecap, const
 	printk("\tMapping in %s, %d pages.\n", label, nsmalls);
 	/* Map in the actual memory - align to 4MB first */
 	for (i = 0; i < nsmalls; i++) {
-		u8_t *  p     = kern_vaddr + i * PAGE_SIZE;
-		paddr_t pf    = chal_va2pa(p);
+		u8_t *  p  = kern_vaddr + i * PAGE_SIZE;
+		paddr_t pf = chal_va2pa(p);
 
-		u32_t   mapat = (u32_t)user_vaddr + i * PAGE_SIZE, flags = 0;
+		u32_t mapat = (u32_t)user_vaddr + i * PAGE_SIZE, flags = 0;
 		if (uvm && pgtbl_mapping_add(pgtbl, mapat, pf, CAV7_4K_USER_DEF, PAGE_ORDER)) assert(0);
 		if (!uvm && pgtbl_cosframe_add(pgtbl, mapat, pf, CAV7_PGTBL_COSFRAME, PAGE_ORDER)) assert(0);
 
@@ -142,10 +140,10 @@ boot_pgtbl_mappings_add(struct captbl *ct, capid_t pgdcap, capid_t ptecap, const
 	/* Also, for the shadow component, create something and map it in. We are very
 	 * clear that we can only make 15 entries due to the limited space of the MCU.
 	 * user_vaddr  */
-	if (uvm !=0) {
+	if (uvm != 0) {
 		user_vaddr = 0x1A000000;
 		/* Allocate 14 ptes */
-		ptes  = sram_boot_alloc(14);
+		ptes = sram_boot_alloc(14);
 		for (i = 0; i < 14; i++) {
 			u8_t *  p  = ptes + i * PAGE_SIZE;
 			paddr_t pf = chal_va2pa(p);
@@ -163,7 +161,7 @@ boot_pgtbl_mappings_add(struct captbl *ct, capid_t pgdcap, capid_t ptecap, const
 		pgtbl = chal_va2pa((pgtbl_t)pgd_cap->pgtbl);
 
 		/* Map in the actual memory - first 16 pages are L2-speed based SRAM, the rest are SDRAM */
-		ptes=sram_uvm_alloc(16);
+		ptes = sram_uvm_alloc(16);
 		printk("\tMapping in SRAM %s, %d pages, vaddr %x.\n", label, 16, ptes);
 		for (i = 0; i < 16; i++) {
 			u8_t *  p     = 0x80010000 + i * PAGE_SIZE;
@@ -176,7 +174,7 @@ boot_pgtbl_mappings_add(struct captbl *ct, capid_t pgdcap, capid_t ptecap, const
 		}
 
 		user_vaddr = 0x1A010000;
-		for (i = 0; i < 13*256; i++) {
+		for (i = 0; i < 13 * 256; i++) {
 			u8_t *  p     = 0x9F000000 + i * PAGE_SIZE;
 			paddr_t pf    = chal_va2pa(p);
 			u32_t   mapat = (u32_t)user_vaddr + i * PAGE_SIZE, flags = 0;
@@ -245,9 +243,9 @@ kern_boot_thd(struct captbl *ct, void *thd_mem, void *tcap_mem, const cpuid_t cp
 	assert(pgtbl);
 	pgtbl_update(pgtbl);
 
-	printk("content %x\n", *((volatile unsigned long*)0x98003400));
-	printk("content2 %x\n", *((volatile unsigned long*)0x98004000));
-	printk("content3 %x\n", *((volatile unsigned long*)0x10000000));
+	printk("content %x\n", *((volatile unsigned long *)0x98003400));
+	printk("content2 %x\n", *((volatile unsigned long *)0x98004000));
+	printk("content3 %x\n", *((volatile unsigned long *)0x10000000));
 
 	printk("\tCreating initial threads, tcaps, and rcv end-points in boot-component.\n");
 }
@@ -255,19 +253,19 @@ kern_boot_thd(struct captbl *ct, void *thd_mem, void *tcap_mem, const cpuid_t cp
 void
 kern_boot_comp(const cpuid_t cpu_id)
 {
-	int            ret = 0, nkmemptes;
-	unsigned int   i;
-	u8_t *         boot_comp_captbl;
-	pgtbl_t        pgtbl     = (pgtbl_t)chal_va2pa(&boot_comp_pgd), boot_vm_pgd, sram_vm_pgd;
-	u32_t          hw_bitmap = 0xFFFFFFFF;
+	int          ret = 0, nkmemptes;
+	unsigned int i;
+	u8_t *       boot_comp_captbl;
+	pgtbl_t      pgtbl     = (pgtbl_t)chal_va2pa(&boot_comp_pgd), boot_vm_pgd, sram_vm_pgd;
+	u32_t        hw_bitmap = 0xFFFFFFFF;
 
 	/* I don't need this ...
 	assert(cpu_id >= 0);
 	if (NUM_CPU > 1 && cpu_id > 0) {
-		assert(glb_boot_ct);
-		pgtbl_update(pgtbl);
-		kern_boot_thd(glb_boot_ct, thd_mem[cpu_id], tcap_mem[cpu_id], cpu_id);
-		return;
+	        assert(glb_boot_ct);
+	        pgtbl_update(pgtbl);
+	        kern_boot_thd(glb_boot_ct, thd_mem[cpu_id], tcap_mem[cpu_id], cpu_id);
+	        return;
 	} */
 
 	printk("Setting up the booter component.\n");
@@ -280,10 +278,12 @@ kern_boot_comp(const cpuid_t cpu_id)
 	/* expand the captbl to use multiple pages. */
 	for (i = PAGE_SIZE; i < BOOT_CAPTBL_NPAGES * PAGE_SIZE; i += PAGE_SIZE) {
 		captbl_init(boot_comp_captbl + i, 1);
-		ret = captbl_expand(glb_boot_ct, (i - PAGE_SIZE / 2) / CAPTBL_LEAFSZ, captbl_maxdepth(), boot_comp_captbl + i);
+		ret = captbl_expand(glb_boot_ct, (i - PAGE_SIZE / 2) / CAPTBL_LEAFSZ, captbl_maxdepth(),
+		                    boot_comp_captbl + i);
 		assert(!ret);
 		captbl_init(boot_comp_captbl + PAGE_SIZE + PAGE_SIZE / 2, 1);
-		ret = captbl_expand(glb_boot_ct, i / CAPTBL_LEAFSZ, captbl_maxdepth(), boot_comp_captbl + i + PAGE_SIZE / 2);
+		ret = captbl_expand(glb_boot_ct, i / CAPTBL_LEAFSZ, captbl_maxdepth(),
+		                    boot_comp_captbl + i + PAGE_SIZE / 2);
 		assert(!ret);
 	}
 
@@ -303,25 +303,24 @@ kern_boot_comp(const cpuid_t cpu_id)
 	 * separate pgd for boot component virtual memory
 	 */
 	boot_vm_pgd = (pgtbl_t)mem_boot_alloc(1);
-	printk("boot vm pgd %x, capid %d\n",boot_vm_pgd, BOOT_CAPTBL_SELF_PT);
+	printk("boot vm pgd %x, capid %d\n", boot_vm_pgd, BOOT_CAPTBL_SELF_PT);
 	assert(boot_vm_pgd);
 	/* There's no need to copy any kernel entry into this - because we know that kernel uses TTBR1 */
-	if (pgtbl_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_PT, (pgtbl_t)boot_vm_pgd, 0))
-		assert(0);
+	if (pgtbl_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_PT, (pgtbl_t)boot_vm_pgd, 0)) assert(0);
 	/*
 	 * separate pgd for shadow booter
 	 */
 	sram_vm_pgd = sram_boot_alloc(1);
-	printk("SRAM vm pgd %x, capid %d\n",sram_vm_pgd, BOOT_CAPTBL_COMP0_PT);
+	printk("SRAM vm pgd %x, capid %d\n", sram_vm_pgd, BOOT_CAPTBL_COMP0_PT);
 	assert(sram_vm_pgd);
-	if (pgtbl_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_COMP0_PT, (pgtbl_t)sram_vm_pgd, 0))
-		assert(0);
+	if (pgtbl_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_COMP0_PT, (pgtbl_t)sram_vm_pgd, 0)) assert(0);
 
 
-	/* This is the booter component - we also make a shadow booter component that replicates the static segments but have
-	 * all its dynamic memory mapping page tables in SRAM. */
-	ret = boot_pgtbl_mappings_add(glb_boot_ct, BOOT_CAPTBL_SELF_PT, BOOT_CAPTBL_BOOTVM_PTE, "booter VM", mem_bootc_start(),
-	                              (unsigned long)mem_bootc_vaddr(), mem_bootc_end() - mem_bootc_start(), 1);
+	/* This is the booter component - we also make a shadow booter component that replicates the static segments but
+	 * have all its dynamic memory mapping page tables in SRAM. */
+	ret = boot_pgtbl_mappings_add(glb_boot_ct, BOOT_CAPTBL_SELF_PT, BOOT_CAPTBL_BOOTVM_PTE, "booter VM",
+	                              mem_bootc_start(), (unsigned long)mem_bootc_vaddr(),
+	                              mem_bootc_end() - mem_bootc_start(), 1);
 	assert(ret == 0);
 
 	/*
@@ -331,18 +330,18 @@ kern_boot_comp(const cpuid_t cpu_id)
 	 * Need to account for the pages that will be allocated as
 	 * PTEs
 	 */
-	if (pgtbl_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_UNTYPED_PT, (pgtbl_t)&boot_comp_pgd, 0)) assert(0);
+	if (pgtbl_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_UNTYPED_PT, (pgtbl_t)&boot_comp_pgd, 0))
+		assert(0);
 	/* We assume 128 pages for SRAM */
 	nkmemptes = boot_nptes(mem_utmem_end() - mem_boot_end());
-	ret       = boot_pgtbl_mappings_add(glb_boot_ct, BOOT_CAPTBL_SELF_UNTYPED_PT, BOOT_CAPTBL_KM_PTE, "untyped memory",
-                                      mem_boot_nalloc_end(nkmemptes), BOOT_MEM_KM_BASE,
-                                      mem_utmem_end() - mem_boot_nalloc_end(nkmemptes), 0);
+	ret = boot_pgtbl_mappings_add(glb_boot_ct, BOOT_CAPTBL_SELF_UNTYPED_PT, BOOT_CAPTBL_KM_PTE, "untyped memory",
+	                              mem_boot_nalloc_end(nkmemptes), BOOT_MEM_KM_BASE,
+	                              mem_utmem_end() - mem_boot_nalloc_end(nkmemptes), 0);
 	assert(ret == 0);
 
 	/* Add the OCSRAM into the page table, also, at a lower address range
-	ret       = boot_pgtbl_mappings_add(glb_boot_ct, BOOT_CAPTBL_SELF_UNTYPED_PT, BOOT_CAPTBL_KM_PTE, "untyped SRAM",
-                                            0x1000, 0x30000000,
-                                            47*0x1000, 0);  */
+	ret       = boot_pgtbl_mappings_add(glb_boot_ct, BOOT_CAPTBL_SELF_UNTYPED_PT, BOOT_CAPTBL_KM_PTE, "untyped
+	SRAM", 0x1000, 0x30000000, 47*0x1000, 0);  */
 	assert(ret == 0);
 
 
@@ -351,13 +350,14 @@ kern_boot_comp(const cpuid_t cpu_id)
 	/* Shut off further bump allocations */
 	glb_memlayout.allocs_avail = 0;
 	/* This is the main component */
-	if (comp_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_COMP, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_PT, 0,
-	                  (vaddr_t)mem_bootc_entry(), NULL))
+	if (comp_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_SELF_COMP, BOOT_CAPTBL_SELF_CT,
+	                  BOOT_CAPTBL_SELF_PT, 0, (vaddr_t)mem_bootc_entry(), NULL))
 		assert(0);
-	if (comp_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_COMP0_COMP, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_COMP0_PT, 0,
-	                  (vaddr_t)mem_bootc_entry(), NULL))
+	if (comp_activate(glb_boot_ct, BOOT_CAPTBL_SELF_CT, BOOT_CAPTBL_COMP0_COMP, BOOT_CAPTBL_SELF_CT,
+	                  BOOT_CAPTBL_COMP0_PT, 0, (vaddr_t)mem_bootc_entry(), NULL))
 		assert(0);
-	printk("\tCreated boot component structure from page-table and capability-table, entry at %x.\n",(vaddr_t)mem_bootc_entry());
+	printk("\tCreated boot component structure from page-table and capability-table, entry at %x.\n",
+	       (vaddr_t)mem_bootc_entry());
 
 	kern_boot_thd(glb_boot_ct, thd_mem[cpu_id], tcap_mem[cpu_id], cpu_id);
 
@@ -372,11 +372,10 @@ kern_boot_upcall(void)
 	void *p;
 
 	assert(get_cpuid() >= 0);
-	printk("Upcall into boot component at ip 0x%x for cpu: %d with tid: %d\n", entry, get_cpuid(), thd_current(cos_cpu_local_info())->tid);
+	printk("Upcall into boot component at ip 0x%x for cpu: %d with tid: %d\n", entry, get_cpuid(),
+	       thd_current(cos_cpu_local_info())->tid);
 	/* only print complete msg for BSP */
-	if (get_cpuid() == 0) {
-		printk("------------------[ Kernel boot complete ]------------------\n");
-	}
+	if (get_cpuid() == 0) { printk("------------------[ Kernel boot complete ]------------------\n"); }
 
 	chal_user_upcall(entry, thd_current(cos_cpu_local_info())->tid, get_cpuid());
 	assert(0); /* should never get here! */

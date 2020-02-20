@@ -21,13 +21,14 @@
  */
 
 
-# define do_div(n,base) ({ 			\
-	int __base = (base); 		\
-	int __rem; 			\
-	__rem = ((long)(n)) % __base;  	\
-	(n) = ((long)(n)) / __base; 	\
-	__rem; 					\
-})
+#define do_div(n, base)                       \
+	({                                    \
+		int __base = (base);          \
+		int __rem;                    \
+		__rem = ((long)(n)) % __base; \
+		(n)   = ((long)(n)) / __base; \
+		__rem;                        \
+	})
 
 
 /* haha, don't need ctype.c */
@@ -88,7 +89,7 @@ number(void (*tx_byte)(unsigned char byte), unsigned long long num, int base, in
 	if (num == 0)
 		tmp[i++] = '0';
 	else
-		while (num != 0) tmp[i++] = digits[do_div(num, base)];
+		;//while (num != 0) tmp[i++] = digits[do_div(num, base)];
 	if (i > precision) precision = i;
 	size -= precision;
 	if (!(type & (ZEROPAD + LEFT)))
@@ -213,7 +214,7 @@ vtxprintf(void (*tx_byte)(unsigned char byte), const char *fmt, va_list args)
 
 		case 's':
 			s = va_arg(args, char *);
-			if (!s) s= "<NULL>";
+			if (!s) s = "<NULL>";
 
 			len = strnlen(s, precision);
 
@@ -281,7 +282,7 @@ vtxprintf(void (*tx_byte)(unsigned char byte), const char *fmt, va_list args)
 			num = va_arg(args, unsigned long);
 		} else if (qualifier == 'h') {
 			num = (unsigned short)va_arg(args, int);
-			if (flags & SIGN) num= (short)num;
+			if (flags & SIGN) num = (short)num;
 		} else if (flags & SIGN) {
 			num = va_arg(args, int);
 		} else {

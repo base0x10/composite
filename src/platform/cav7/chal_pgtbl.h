@@ -2,7 +2,8 @@
 #define CHAL_PGTBL_H
 
 /* These code below are for x86 specifically, only used in x86 chal */
-typedef enum {
+typedef enum
+{
 	CAV7_1M_PGDIR_PRESENT   = 0x01U,
 	CAV7_1M_PGDIR_NOTSECURE = (1U << 3U),
 	CAV7_1M_PAGE_PRESENT    = (0x02U),
@@ -16,34 +17,36 @@ typedef enum {
 	CAV7_1M_NOTGLOBAL       = (1U << 17U),
 	CAV7_1M_NOTSECURE       = (1U << 19U),
 
-	CAV7_4K_EXECUTENEVER    = (1U << 0U),
-	CAV7_4K_PAGE_PRESENT    = (1U << 1U),
-	CAV7_4K_BUFFERABLE      = (1U << 2U),
-	CAV7_4K_CACHEABLE       = (1U << 3U),
-	CAV7_4K_ACCESS          = (1U << 4U),
-	CAV7_4K_USER            = (1U << 5U),
-	CAV7_4K_READONLY        = (1U << 9U),
-	CAV7_4K_SHAREABLE       = (1U << 10U),
-	CAV7_4K_NOTGLOBAL       = (1U << 11U),
+	CAV7_4K_EXECUTENEVER = (1U << 0U),
+	CAV7_4K_PAGE_PRESENT = (1U << 1U),
+	CAV7_4K_BUFFERABLE   = (1U << 2U),
+	CAV7_4K_CACHEABLE    = (1U << 3U),
+	CAV7_4K_ACCESS       = (1U << 4U),
+	CAV7_4K_USER         = (1U << 5U),
+	CAV7_4K_READONLY     = (1U << 9U),
+	CAV7_4K_SHAREABLE    = (1U << 10U),
+	CAV7_4K_NOTGLOBAL    = (1U << 11U),
 
 	/* Composite defined bits next - the cosframe will be there if the present is empty */
-	CAV7_PGTBL_COSFRAME     = 1U << 11U,
+	CAV7_PGTBL_COSFRAME = 1U << 11U,
 	/* We enabled TEX remap, thus these two bits are freed */
-	CAV7_PGTBL_COSKMEM      = 1U << 8U, /* page activated as kernel object */
-	CAV7_PGTBL_QUIESCENCE   = 1U << 7U,
+	CAV7_PGTBL_COSKMEM    = 1U << 8U, /* page activated as kernel object */
+	CAV7_PGTBL_QUIESCENCE = 1U << 7U,
 	/* Flag bits done. */
-	CAV7_4K_USER_COMMON     = CAV7_4K_PAGE_PRESENT|CAV7_4K_USER|CAV7_4K_SHAREABLE|CAV7_4K_NOTGLOBAL|CAV7_4K_ACCESS,
-	CAV7_4K_USER_DEF        = CAV7_4K_USER_COMMON|CAV7_4K_BUFFERABLE|CAV7_4K_CACHEABLE,
+	CAV7_4K_USER_COMMON = CAV7_4K_PAGE_PRESENT | CAV7_4K_USER | CAV7_4K_SHAREABLE | CAV7_4K_NOTGLOBAL
+	                      | CAV7_4K_ACCESS,
+	CAV7_4K_USER_DEF = CAV7_4K_USER_COMMON | CAV7_4K_BUFFERABLE | CAV7_4K_CACHEABLE,
 
-	CAV7_1M_USER_COMMON     = CAV7_1M_PAGE_PRESENT|CAV7_1M_USER|CAV7_1M_SHAREABLE|CAV7_1M_NOTGLOBAL|CAV7_1M_ACCESS,
-	CAV7_1M_USER_DEF        = CAV7_1M_USER_COMMON|CAV7_1M_BUFFERABLE|CAV7_1M_CACHEABLE,
-	CAV7_1M_USER_SEQ        = CAV7_1M_USER_COMMON,
+	CAV7_1M_USER_COMMON = CAV7_1M_PAGE_PRESENT | CAV7_1M_USER | CAV7_1M_SHAREABLE | CAV7_1M_NOTGLOBAL
+	                      | CAV7_1M_ACCESS,
+	CAV7_1M_USER_DEF = CAV7_1M_USER_COMMON | CAV7_1M_BUFFERABLE | CAV7_1M_CACHEABLE,
+	CAV7_1M_USER_SEQ = CAV7_1M_USER_COMMON,
 
-	CAV7_1M_KERN_COMMON     = CAV7_1M_PAGE_PRESENT|CAV7_1M_SHAREABLE|CAV7_1M_NOTGLOBAL|CAV7_1M_ACCESS,
-	CAV7_1M_KERN_DEF        = CAV7_1M_KERN_COMMON|CAV7_1M_BUFFERABLE|CAV7_1M_CACHEABLE,
-	CAV7_1M_KERN_SEQ        = CAV7_1M_KERN_COMMON,
+	CAV7_1M_KERN_COMMON = CAV7_1M_PAGE_PRESENT | CAV7_1M_SHAREABLE | CAV7_1M_NOTGLOBAL | CAV7_1M_ACCESS,
+	CAV7_1M_KERN_DEF    = CAV7_1M_KERN_COMMON | CAV7_1M_BUFFERABLE | CAV7_1M_CACHEABLE,
+	CAV7_1M_KERN_SEQ    = CAV7_1M_KERN_COMMON,
 
-	CAV7_1M_INTERN_DEF      = CAV7_1M_PGDIR_PRESENT,
+	CAV7_1M_INTERN_DEF = CAV7_1M_PGDIR_PRESENT,
 } pgtbl_flags_cav7_t;
 
 /* MMU definitions operation flags, assuming the following changes:
@@ -65,20 +68,22 @@ typedef enum {
  * C- : Cacheable non-bufferable - normal, write-through without write allocate
  * CB : Cachaable bufferable - normal memory, write-back, write-allocate */
 
-#define CAV7_4G_PGTBL_ADDR(X)    ((X) & 0xFFFFF000U)
-#define CAV7_1M_PGTBL_ADDR(X)    ((X) & 0xFFFFFC00U)
-#define CAV7_1M_PAGE_ADDR(X)     ((X) & 0xFFF00000U)
-#define CAV7_4K_PAGE_ADDR(X)     ((X) & 0xFFFFF000U)
-#define CAV7_4K_PAGE_FLAGS(X)    ((X) & 0x00000FFFU)
+#define CAV7_4G_PGTBL_ADDR(X) ((X)&0xFFFFF000U)
+#define CAV7_1M_PGTBL_ADDR(X) ((X)&0xFFFFFC00U)
+#define CAV7_1M_PAGE_ADDR(X) ((X)&0xFFF00000U)
+#define CAV7_4K_PAGE_ADDR(X) ((X)&0xFFFFF000U)
+#define CAV7_4K_PAGE_FLAGS(X) ((X)&0x00000FFFU)
 
 #define CAV7_PGFLG_1M_COS2NAT(X) (CAV7_Pgflg_1M_COS2NAT[X])
-#define CAV7_PGFLG_1M_PREPROC(X) ((((X) & CAV7_1M_READONLY) >> 12) | (((X) & CAV7_1M_EXECUTENEVER) >> 2) | \
-		                  (((X) & CAV7_1M_CACHEABLE) >> 2) | (((X) & CAV7_1M_BUFFERABLE) >> 2))
+#define CAV7_PGFLG_1M_PREPROC(X)                                                                             \
+	((((X)&CAV7_1M_READONLY) >> 12) | (((X)&CAV7_1M_EXECUTENEVER) >> 2) | (((X)&CAV7_1M_CACHEABLE) >> 2) \
+	 | (((X)&CAV7_1M_BUFFERABLE) >> 2))
 #define CAV7_PGFLG_1M_NAT2COS(X) (CAV7_Pgflg_1M_NAT2COS[CAV7_PGFLG_1M_PREPROC(X)])
 
 #define CAV7_PGFLG_4K_RME2NAT(X) (CAV7_Pgflg_4K_RME2NAT[X])
-#define CAV7_PGFLG_4K_PREPROC(X) ((((X) & CAV7_4K_READONLY) >> 6) | (((X) & CAV7_4K_CACHEABLE) >> 1)| \
-		                  (((X) & CAV7_4K_BUFFERABLE) >> 1) | (((X) & CAV7_4K_EXECUTENEVER) >> 0))
+#define CAV7_PGFLG_4K_PREPROC(X)                                                                          \
+	((((X)&CAV7_4K_READONLY) >> 6) | (((X)&CAV7_4K_CACHEABLE) >> 1) | (((X)&CAV7_4K_BUFFERABLE) >> 1) \
+	 | (((X)&CAV7_4K_EXECUTENEVER) >> 0))
 #define CAV7_PGFLG_4K_NAT2RME(X) (CAV7_Pgflg_4K_NAT2RME[CAV7_4K_PREPROC(X)])
 
 /**
@@ -113,7 +118,7 @@ __pgtbl_update_leaf(struct ert_intern *a, void *v, u32_t old)
 
 	new = (u32_t)(v);
 	if (!cos_cas((unsigned long *)a, old, new)) return -ECASFAIL;
-/* printk("old %x, new %x, addr %x\n", old, new, a); */
+	/* printk("old %x, new %x, addr %x\n", old, new, a); */
 	return 0;
 }
 
@@ -144,4 +149,3 @@ __pgtbl_init(struct ert_intern *a, int isleaf)
 }
 
 #endif /* CHAL_PGTBL_H */
-

@@ -11,7 +11,7 @@
 #include <sched_info.h>
 #include <sl_child.h>
 
-u32_t cycs_per_usec = 0;
+u32_t         cycs_per_usec = 0;
 extern cbuf_t parent_schedinit_child(void);
 
 #define INITIALIZE_PRIO 1
@@ -32,9 +32,7 @@ schedinit_self(void)
 	/* if my init is done and i've all child inits */
 	if (self_init[cos_cpuid()] && num_child_init[cos_cpuid()] == sched_num_childsched_get()) {
 		id = parent_schedinit_child();
-		if (sl_child_notif_map(id)) {
-			PRINTLOG(PRINT_WARN, "PARENT NOTIFs WILL NOT WORK!\n");
-		}
+		if (sl_child_notif_map(id)) { PRINTLOG(PRINT_WARN, "PARENT NOTIFs WILL NOT WORK!\n"); }
 
 		return 0;
 	}
@@ -69,10 +67,10 @@ void
 cos_init(void)
 {
 	struct cos_defcompinfo *defci = cos_defcompinfo_curr_get();
-	struct cos_compinfo    *ci    = cos_compinfo_get(defci);
-	static volatile int first = NUM_CPU + 1, init_done[NUM_CPU] = { 0 };
-	static u32_t cpubmp[NUM_CPU_BMP_WORDS] = { 0 };
-	int i;
+	struct cos_compinfo *   ci    = cos_compinfo_get(defci);
+	static volatile int     first = NUM_CPU + 1, init_done[NUM_CPU] = {0};
+	static u32_t            cpubmp[NUM_CPU_BMP_WORDS] = {0};
+	int                     i;
 
 	PRINTLOG(PRINT_DEBUG, "CPU cycles per sec: %u\n", cos_hw_cycles_per_usec(BOOT_CAPTBL_SELF_INITHW_BASE));
 
@@ -81,7 +79,8 @@ cos_init(void)
 		cos_defcompinfo_init();
 		cos_init_args_cpubmp(cpubmp);
 	} else {
-		while (!ps_load((unsigned long *)&init_done[first])) ;
+		while (!ps_load((unsigned long *)&init_done[first]))
+			;
 
 		cos_defcompinfo_sched_init();
 	}
@@ -91,7 +90,8 @@ cos_init(void)
 	for (i = 0; i < NUM_CPU; i++) {
 		if (!bitmap_check(cpubmp, i)) continue;
 
-		while (!ps_load((unsigned long *)&init_done[i])) ;
+		while (!ps_load((unsigned long *)&init_done[i]))
+			;
 	}
 
 	sl_init_cpubmp(SL_MIN_PERIOD_US, cpubmp);

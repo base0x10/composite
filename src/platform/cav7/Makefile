@@ -49,6 +49,7 @@ OBJS += chal_pgtbl.o
 OBJS += irq.o
 # OBJS += start.o
 OBJS += vtxprintf.o 
+OBSJ += div.o
 
 COS_OBJ += pgtbl.o
 COS_OBJ += retype_tbl.o

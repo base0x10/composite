@@ -16,7 +16,7 @@
 
 struct sched_childinfo {
 	struct cos_defcompinfo defcinfo;
-	struct sl_thd         *initthd;
+	struct sl_thd *        initthd;
 	comp_flag_t            flags;
 	spdid_t                id;
 	u32_t                  cpubmp[NUM_CPU_BMP_WORDS];
@@ -24,10 +24,10 @@ struct sched_childinfo {
 
 struct sched_childinfo *sched_childinfo_find(spdid_t spdid);
 struct sched_childinfo *sched_childinfo_alloc(spdid_t id, compcap_t compcap, comp_flag_t flags);
-unsigned int sched_num_child_get(void);
-unsigned int sched_num_childsched_get(void);
-void sched_childinfo_init(void);
-void sched_childinfo_init_raw(void);
+unsigned int            sched_num_child_get(void);
+unsigned int            sched_num_childsched_get(void);
+void                    sched_childinfo_init(void);
+void                    sched_childinfo_init_raw(void);
 
 extern unsigned int self_init[], num_child_init[];
 

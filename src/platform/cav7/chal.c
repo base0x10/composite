@@ -60,7 +60,7 @@ chal_init(void)
 	lapic_timer_init();
 	l2cache_init();
 	/* Initialize the vector table */
-	printk("CAV7-Vector table: 0x%x\r\n",(unsigned long)&__cos_cav7_vector_table);
+	printk("CAV7-Vector table: 0x%x\r\n", (unsigned long)&__cos_cav7_vector_table);
 	__cos_cav7_vbar_set((unsigned long)&__cos_cav7_vector_table);
 
 	printk("CAV7-Init: complete\r\n");
@@ -69,7 +69,6 @@ chal_init(void)
 void
 chal_tls_update(vaddr_t tlsaddr)
 {
-
 }
 
 int
@@ -82,7 +81,8 @@ void
 _exit(int code)
 {
 	/* dead loop */
-	while(1);
+	while (1)
+		;
 }
 
 int
@@ -97,8 +97,8 @@ _getpid(void)
 	return -1;
 }
 
-char*
+char *
 _sbrk(int incr)
 {
-	return (char*)(0);
+	return (char *)(0);
 }

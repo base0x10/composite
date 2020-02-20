@@ -28,18 +28,17 @@
  * fault. This is very bad; we are letting this go.
  * 0x00000000 -> 0x00000000 0x400 pages, user-level
  * 0x00000000 -> 0x80000000 0x800 pages, kernel */
-#define CAV7_MEM_ENTRIES        (5*4U+1U)*4U
-#define CAV7_MEM_CONTENTS \
-/* Number of entries */ \
-  CAV7_MEM_ENTRIES, \
-/* Start_PA    Start_VA    Num             Attributes   0xc02      */ \
-  0x00000000, 0x00000000, 0x400, CAV7_1M_USER_DEF /* User memory - 1008 MB DDR2 SDRAM identically mapped */, \
-  0x40000000, 0x40000000, 0x400, CAV7_1M_USER_SEQ  /* Kernel devices - 512MB device space */, \
-  0x00000000, 0x80000000, 0x400, CAV7_1M_KERN_DEF /* Kernel memory - 1023MB DDR2 SDRAM */, \
-  0x40100000, 0xC0100000, 0x1FF, CAV7_1M_USER_SEQ /* Kernel devices - 512MB device space */, \
-  0xE0000000, 0xE0000000, 0x200, CAV7_1M_USER_SEQ /* Kernel devices - 512MB Cortex device space */
+#define CAV7_MEM_ENTRIES (5 * 4U + 1U) * 4U
+#define CAV7_MEM_CONTENTS                                                                                             \
+	/* Number of entries */                                                                                       \
+	CAV7_MEM_ENTRIES, /* Start_PA    Start_VA    Num             Attributes   0xc02      */                       \
+	  0x00000000, 0x00000000, 0x400, CAV7_1M_USER_DEF /* User memory - 1008 MB DDR2 SDRAM identically mapped */,  \
+	  0x40000000, 0x40000000, 0x400, CAV7_1M_USER_SEQ /* Kernel devices - 512MB device space */, 0x00000000,      \
+	  0x80000000, 0x400, CAV7_1M_KERN_DEF /* Kernel memory - 1023MB DDR2 SDRAM */, 0x40100000, 0xC0100000, 0x1FF, \
+	  CAV7_1M_USER_SEQ /* Kernel devices - 512MB device space */, 0xE0000000, 0xE0000000, 0x200,                  \
+	  CAV7_1M_USER_SEQ /* Kernel devices - 512MB Cortex device space */
 
-unsigned long cos_cav7_mem_info[CAV7_MEM_ENTRIES]={CAV7_MEM_CONTENTS};
+unsigned long cos_cav7_mem_info[CAV7_MEM_ENTRIES] = {CAV7_MEM_CONTENTS};
 
 //0x00000000, 0xC0000000, 0x1,   CAV7_1M_KERN_DEF /* Kernel memory - 192kB OCSRAM */, \
 /* Convert the flags from composite standard to ARM standard */
@@ -48,22 +47,15 @@ chal_pgtbl_flag_cos2nat_1M(unsigned long input)
 {
 	unsigned long output = CAV7_1M_ACCESS | CAV7_1M_SHAREABLE | CAV7_1M_USER;
 
-	if ((input & PGTBL_PRESENT) != 0)
-		output |= CAV7_1M_PAGE_PRESENT;
-	if ((input & PGTBL_WRITABLE) == 0)
-		output |= CAV7_1M_READONLY;
-	if ((input & PGTBL_WT) == 0)
-		output |= CAV7_1M_BUFFERABLE;
-	if ((input & PGTBL_NOCACHE) == 0)
-		output |= CAV7_1M_CACHEABLE;
+	if ((input & PGTBL_PRESENT) != 0) output |= CAV7_1M_PAGE_PRESENT;
+	if ((input & PGTBL_WRITABLE) == 0) output |= CAV7_1M_READONLY;
+	if ((input & PGTBL_WT) == 0) output |= CAV7_1M_BUFFERABLE;
+	if ((input & PGTBL_NOCACHE) == 0) output |= CAV7_1M_CACHEABLE;
 
 	/* Convert composite specific bits */
-	if ((input & PGTBL_COSFRAME) != 0)
-		output |= CAV7_PGTBL_COSFRAME;
-	if ((input & PGTBL_COSKMEM) != 0)
-		output |= CAV7_PGTBL_COSKMEM;
-	if ((input & PGTBL_QUIESCENCE) != 0)
-		output |= CAV7_PGTBL_QUIESCENCE;
+	if ((input & PGTBL_COSFRAME) != 0) output |= CAV7_PGTBL_COSFRAME;
+	if ((input & PGTBL_COSKMEM) != 0) output |= CAV7_PGTBL_COSKMEM;
+	if ((input & PGTBL_QUIESCENCE) != 0) output |= CAV7_PGTBL_QUIESCENCE;
 
 	return output;
 }
@@ -74,22 +66,15 @@ chal_pgtbl_flag_cos2nat_4K(unsigned long input)
 {
 	unsigned long output = CAV7_4K_ACCESS | CAV7_4K_SHAREABLE | CAV7_4K_USER;
 
-	if ((input & PGTBL_PRESENT) != 0)
-		output |= CAV7_4K_PAGE_PRESENT;
-	if ((input & PGTBL_WRITABLE) == 0)
-		output |= CAV7_4K_READONLY;
-	if ((input & PGTBL_WT) == 0)
-		output |= CAV7_4K_BUFFERABLE;
-	if ((input & PGTBL_NOCACHE) == 0)
-		output |= CAV7_4K_CACHEABLE;
+	if ((input & PGTBL_PRESENT) != 0) output |= CAV7_4K_PAGE_PRESENT;
+	if ((input & PGTBL_WRITABLE) == 0) output |= CAV7_4K_READONLY;
+	if ((input & PGTBL_WT) == 0) output |= CAV7_4K_BUFFERABLE;
+	if ((input & PGTBL_NOCACHE) == 0) output |= CAV7_4K_CACHEABLE;
 
 	/* Convert composite specific bits */
-	if ((input & PGTBL_COSFRAME) != 0)
-		output |= CAV7_PGTBL_COSFRAME;
-	if ((input & PGTBL_COSKMEM) != 0)
-		output |= CAV7_PGTBL_COSKMEM;
-	if ((input & PGTBL_QUIESCENCE) != 0)
-		output |= CAV7_PGTBL_QUIESCENCE;
+	if ((input & PGTBL_COSFRAME) != 0) output |= CAV7_PGTBL_COSFRAME;
+	if ((input & PGTBL_COSKMEM) != 0) output |= CAV7_PGTBL_COSKMEM;
+	if ((input & PGTBL_QUIESCENCE) != 0) output |= CAV7_PGTBL_QUIESCENCE;
 
 	return output;
 }
@@ -99,25 +84,18 @@ chal_pgtbl_flag_nat2cos_1M(unsigned long input)
 {
 	unsigned long output = PGTBL_SUPER | PGTBL_USER;
 
-	if ((input & CAV7_1M_PAGE_PRESENT) != 0)
-		output |= PGTBL_PRESENT;
-	if ((input & CAV7_1M_READONLY) == 0)
-		output |= PGTBL_WRITABLE;
-	if ((input & CAV7_1M_BUFFERABLE) == 0)
-		output |= PGTBL_WT;
-	if ((input & CAV7_1M_CACHEABLE) == 0)
-		output |= PGTBL_NOCACHE;
+	if ((input & CAV7_1M_PAGE_PRESENT) != 0) output |= PGTBL_PRESENT;
+	if ((input & CAV7_1M_READONLY) == 0) output |= PGTBL_WRITABLE;
+	if ((input & CAV7_1M_BUFFERABLE) == 0) output |= PGTBL_WT;
+	if ((input & CAV7_1M_CACHEABLE) == 0) output |= PGTBL_NOCACHE;
 
 	/* Convert composite specific bits */
 	if ((input & CAV7_1M_PAGE_PRESENT) == 0) {
 		/* When not present, this serves as cosframe */
-		if ((input & CAV7_PGTBL_COSFRAME) != 0)
-			output |= PGTBL_COSFRAME;
+		if ((input & CAV7_PGTBL_COSFRAME) != 0) output |= PGTBL_COSFRAME;
 	}
-	if ((input & CAV7_PGTBL_COSKMEM) != 0)
-		output |= PGTBL_COSKMEM;
-	if ((input & CAV7_PGTBL_QUIESCENCE) != 0)
-		output |= PGTBL_QUIESCENCE;
+	if ((input & CAV7_PGTBL_COSKMEM) != 0) output |= PGTBL_COSKMEM;
+	if ((input & CAV7_PGTBL_QUIESCENCE) != 0) output |= PGTBL_QUIESCENCE;
 
 	return output;
 }
@@ -127,25 +105,18 @@ chal_pgtbl_flag_nat2cos_4K(unsigned long input)
 {
 	unsigned long output = PGTBL_USER;
 
-	if ((input & CAV7_4K_PAGE_PRESENT) != 0)
-		output |= PGTBL_PRESENT;
-	if ((input & CAV7_4K_READONLY) == 0)
-		output |= PGTBL_WRITABLE;
-	if ((input & CAV7_4K_BUFFERABLE) == 0)
-		output |= PGTBL_WT;
-	if ((input & CAV7_4K_CACHEABLE) == 0)
-		output |= PGTBL_NOCACHE;
+	if ((input & CAV7_4K_PAGE_PRESENT) != 0) output |= PGTBL_PRESENT;
+	if ((input & CAV7_4K_READONLY) == 0) output |= PGTBL_WRITABLE;
+	if ((input & CAV7_4K_BUFFERABLE) == 0) output |= PGTBL_WT;
+	if ((input & CAV7_4K_CACHEABLE) == 0) output |= PGTBL_NOCACHE;
 
 	/* Convert composite specific bits */
 	if ((input & CAV7_4K_PAGE_PRESENT) == 0) {
 		/* When not present, this serves as cosframe */
-		if ((input & CAV7_PGTBL_COSFRAME) != 0)
-			output |= PGTBL_COSFRAME;
+		if ((input & CAV7_PGTBL_COSFRAME) != 0) output |= PGTBL_COSFRAME;
 	}
-	if ((input & CAV7_PGTBL_COSKMEM) != 0)
-		output |= PGTBL_COSKMEM;
-	if ((input & CAV7_PGTBL_QUIESCENCE) != 0)
-		output |= PGTBL_QUIESCENCE;
+	if ((input & CAV7_PGTBL_COSKMEM) != 0) output |= PGTBL_COSKMEM;
+	if ((input & CAV7_PGTBL_QUIESCENCE) != 0) output |= PGTBL_QUIESCENCE;
 
 	return output;
 }
@@ -184,33 +155,31 @@ chal_pgtbl_flag_all(unsigned long input, pgtbl_flags_t flags)
 	return chal_pgtbl_flag_exist(input, flags) == flags;
 }
 
-unsigned long 
+unsigned long
 chal_pgtbl_frame(unsigned long input)
 {
 	return CAV7_4K_PAGE_ADDR(input);
 }
 
-unsigned long 
+unsigned long
 chal_pgtbl_flag(unsigned long input)
 {
 	return CAV7_4K_PAGE_FLAGS(input);
 }
 
 /* Perform page table walks in the ARM architecture */
-unsigned long*
+unsigned long *
 __chal_pgtbl_lkup(pgtbl_t pt, unsigned long addr)
 {
-	unsigned long* next;
+	unsigned long *next;
 
-	if (addr >= 0x40000000)
-		return 0;
+	if (addr >= 0x40000000) return 0;
 
-	next = (unsigned long*)(((unsigned long*)pt)[addr >> PGTBL_PGTIDX_SHIFT]);
+	next = (unsigned long *)(((unsigned long *)pt)[addr >> PGTBL_PGTIDX_SHIFT]);
 
-	if ((((unsigned long)next) & CAV7_1M_PGDIR_PRESENT) == 0)
-		return 0;
+	if ((((unsigned long)next) & CAV7_1M_PGDIR_PRESENT) == 0) return 0;
 
-	next = (unsigned long*)chal_pa2va(CAV7_1M_PGTBL_ADDR((unsigned long)next));
+	next = (unsigned long *)chal_pa2va(CAV7_1M_PGTBL_ADDR((unsigned long)next));
 	return &(next[(addr >> PGTBL_PAGEIDX_SHIFT) & 0xFF]);
 }
 
@@ -296,7 +265,8 @@ chal_tlb_quiescence_check(u64_t timestamp)
 }
 
 int
-chal_cap_memactivate(struct captbl *ct, struct cap_pgtbl *pt, capid_t frame_cap, capid_t dest_pt, vaddr_t vaddr, vaddr_t order)
+chal_cap_memactivate(struct captbl *ct, struct cap_pgtbl *pt, capid_t frame_cap, capid_t dest_pt, vaddr_t vaddr,
+                     vaddr_t order)
 {
 	unsigned long *    pte, cosframe, orig_v;
 	struct cap_header *dest_pt_h;
@@ -309,8 +279,7 @@ chal_cap_memactivate(struct captbl *ct, struct cap_pgtbl *pt, capid_t frame_cap,
 	if (((struct cap_pgtbl *)dest_pt_h)->lvl) return -EINVAL;
 
 	/* What is the order needed for this? */
-	if (order != PGTBL_PAGEIDX_SHIFT)
-		return -EINVAL;
+	if (order != PGTBL_PAGEIDX_SHIFT) return -EINVAL;
 
 	/* Only 4k pages are allowed for activation */
 	pte = __chal_pgtbl_lkup(pt->pgtbl, frame_cap);
@@ -320,9 +289,10 @@ chal_cap_memactivate(struct captbl *ct, struct cap_pgtbl *pt, capid_t frame_cap,
 	if (!(orig_v & CAV7_PGTBL_COSFRAME) || (orig_v & CAV7_PGTBL_COSKMEM)) return -EPERM;
 	assert(!(orig_v & CAV7_PGTBL_QUIESCENCE));
 	cosframe = orig_v & PGTBL_FRAME_MASK;
-	flags = CAV7_4K_USER_DEF;
+	flags    = CAV7_4K_USER_DEF;
 
-/* printk("cosframe %x dest pt %x vaddr %x flags %x\n", cosframe, ((struct cap_pgtbl *)dest_pt_h)->pgtbl, vaddr, flags); */
+	/* printk("cosframe %x dest pt %x vaddr %x flags %x\n", cosframe, ((struct cap_pgtbl *)dest_pt_h)->pgtbl, vaddr,
+	 * flags); */
 	ret = pgtbl_mapping_add(((struct cap_pgtbl *)dest_pt_h)->pgtbl, vaddr, cosframe, flags, order);
 	return ret;
 }
@@ -346,8 +316,8 @@ chal_pgtbl_activate(struct captbl *t, unsigned long cap, unsigned long capin, pg
 }
 
 int
-chal_pgtbl_deactivate(struct captbl *t, struct cap_captbl *dest_ct_cap, unsigned long capin,
-                      livenessid_t lid, capid_t pgtbl_cap, capid_t cosframe_addr, const int root)
+chal_pgtbl_deactivate(struct captbl *t, struct cap_captbl *dest_ct_cap, unsigned long capin, livenessid_t lid,
+                      capid_t pgtbl_cap, capid_t cosframe_addr, const int root)
 {
 	struct cap_header *deact_header;
 	struct cap_pgtbl * deact_cap, *parent;
@@ -382,7 +352,8 @@ chal_pgtbl_deactivate(struct captbl *t, struct cap_captbl *dest_ct_cap, unsigned
 		assert(!pgtbl_cap && !cosframe_addr);
 	}
 
-	if (cos_cas((unsigned long *)&deact_cap->refcnt_flags, l, CAP_MEM_FROZEN_FLAG) != CAS_SUCCESS) cos_throw(err, -ECASFAIL);
+	if (cos_cas((unsigned long *)&deact_cap->refcnt_flags, l, CAP_MEM_FROZEN_FLAG) != CAS_SUCCESS)
+		cos_throw(err, -ECASFAIL);
 
 	/*
 	 * deactivation success. We should either release the
@@ -522,13 +493,13 @@ chal_pgtbl_mapping_del(pgtbl_t pt, u32_t addr, u32_t liv_id)
 	if (unlikely(ret)) goto done;
 
 	/* Get the PGD to see if we are deleting a superpage */
-	pte = (struct ert_intern *)__chal_pgtbl_lkup(pt, addr);
+	pte    = (struct ert_intern *)__chal_pgtbl_lkup(pt, addr);
 	orig_v = (u32_t)(pte->next);
 	if (!(orig_v & CAV7_4K_PAGE_PRESENT)) return -EEXIST;
 	if (orig_v & CAV7_PGTBL_COSFRAME) return -EPERM;
 
 	order = PAGE_ORDER;
-	ret = __pgtbl_update_leaf(pte, (void *)((liv_id << PGTBL_PAGEIDX_SHIFT) | CAV7_PGTBL_QUIESCENCE), orig_v);
+	ret   = __pgtbl_update_leaf(pte, (void *)((liv_id << PGTBL_PAGEIDX_SHIFT) | CAV7_PGTBL_QUIESCENCE), orig_v);
 	if (ret) cos_throw(done, ret);
 
 	/* decrement ref cnt on the frame. */
@@ -550,7 +521,7 @@ chal_pgtbl_mapping_del_direct(pgtbl_t pt, u32_t addr)
 
 	assert(pt);
 	assert((PGTBL_FLAG_MASK & addr) == 0);
-	pte = (struct ert_intern *)__chal_pgtbl_lkup(pt, addr);
+	pte  = (struct ert_intern *)__chal_pgtbl_lkup(pt, addr);
 	*pte = 0;
 	return 0;
 }
@@ -563,9 +534,9 @@ chal_pgtbl_mapping_scan(struct cap_pgtbl *pt)
 	u64_t        past_ts;
 
 	/**
-         * This scans the leaf level of the pgtbl and verifies
+	 * This scans the leaf level of the pgtbl and verifies
 	 * quiescence.
-         */
+	 */
 	if (pt->lvl != PGTBL_DEPTH - 1) return -EINVAL;
 
 	page = (unsigned int *)(pt->pgtbl);
@@ -591,16 +562,15 @@ void *
 chal_pgtbl_lkup_lvl(pgtbl_t pt, u32_t addr, u32_t *flags, u32_t start_lvl, u32_t end_lvl)
 {
 	/* We return level 1 in all cases */
-	unsigned long* next;
+	unsigned long *next;
 
-	if (addr >= 0x40000000)
-		return 0;
+	if (addr >= 0x40000000) return 0;
 
-	next = &(((unsigned long*)pt)[addr >> PGTBL_PGTIDX_SHIFT]);
-/*
-	if ((((unsigned long)next) & CAV7_1M_PGDIR_PRESENT) == 0)
-		return 0;
-*/
+	next = &(((unsigned long *)pt)[addr >> PGTBL_PGTIDX_SHIFT]);
+	/*
+	        if ((((unsigned long)next) & CAV7_1M_PGDIR_PRESENT) == 0)
+	                return 0;
+	*/
 	return next;
 }
 
@@ -613,22 +583,22 @@ chal_pgtbl_ispresent(u32_t flags)
 unsigned long *
 chal_pgtbl_lkup(pgtbl_t pt, u32_t addr, u32_t *flags)
 {
-	unsigned long* pte;
+	unsigned long *pte;
 	/* We return level 2 only in all lookups */
-	pte = __chal_pgtbl_lkup(pt, addr);
+	pte    = __chal_pgtbl_lkup(pt, addr);
 	*flags = chal_pgtbl_flag_nat2cos_4K(*pte);
 	if (!pgtbl_ispresent(*flags)) return NULL;
 
-	return (unsigned long*)chal_pa2va(CAV7_4K_PAGE_ADDR(*pte));
+	return (unsigned long *)chal_pa2va(CAV7_4K_PAGE_ADDR(*pte));
 }
 
 unsigned long *
 chal_pgtbl_lkup_pte(pgtbl_t pt, u32_t addr, u32_t *flags)
 {
-	unsigned long* pte;
+	unsigned long *pte;
 
 	/* We return level 2 only in all lookups */
-	pte = __chal_pgtbl_lkup(pt, addr);
+	pte    = __chal_pgtbl_lkup(pt, addr);
 	*flags = chal_pgtbl_flag_nat2cos_4K(*pte);
 	if (!pgtbl_ispresent(*flags)) return NULL;
 
@@ -639,12 +609,11 @@ unsigned long *
 chal_pgtbl_lkup_pgd(pgtbl_t pt, u32_t addr, u32_t *flags)
 {
 	/* We return level 1 in all cases */
-	unsigned long* next;
+	unsigned long *next;
 
-	if (addr >= 0x40000000)
-		return 0;
+	if (addr >= 0x40000000) return 0;
 
-	next = &(((unsigned long*)pt)[addr >> PGTBL_PGTIDX_SHIFT]);
+	next   = &(((unsigned long *)pt)[addr >> PGTBL_PGTIDX_SHIFT]);
 	*flags = ((unsigned long)pt) & (0xFFFFFFFF << PGTBL_PGTIDX_SHIFT);
 
 	return next;
@@ -661,9 +630,9 @@ chal_pgtbl_get_cosframe(pgtbl_t pt, vaddr_t frame_addr, paddr_t *cosframe, vaddr
 	pte = pgtbl_lkup_pte(pt, frame_addr, &flags);
 	if (!pte) return -EINVAL;
 
-	v = *pte;
+	v      = *pte;
 	*order = PAGE_ORDER;
-	
+
 	if (!(v & CAV7_PGTBL_COSFRAME)) return -EINVAL;
 
 	*cosframe = v & PGTBL_FRAME_MASK;
@@ -714,14 +683,15 @@ chal_pgtbl_init_pte(void *pte)
 {
 	int            i;
 	unsigned long *vals = pte;
-	for (i = 0; i < (1 << 8/* (PGTBL_ENTRY_ORDER) */); i++) vals[i] = 0;
+	for (i = 0; i < (1 << 8 /* (PGTBL_ENTRY_ORDER) */); i++) vals[i] = 0;
 }
 
 extern const int order2pos[];
-#define POS(order)       (order2pos[order])
-#define LVL(order)       (1-POS(order))
+#define POS(order) (order2pos[order])
+#define LVL(order) (1 - POS(order))
 int
-chal_pgtbl_pgtblactivate(struct captbl *ct, capid_t cap, capid_t pt_entry, capid_t pgtbl_cap, vaddr_t kmem_cap, capid_t pgtbl_order)
+chal_pgtbl_pgtblactivate(struct captbl *ct, capid_t cap, capid_t pt_entry, capid_t pgtbl_cap, vaddr_t kmem_cap,
+                         capid_t pgtbl_order)
 {
 	pgtbl_t        new_pt, curr_pt;
 	vaddr_t        kmem_addr = 0;
@@ -761,18 +731,19 @@ chal_pgtbl_pgtblactivate(struct captbl *ct, capid_t cap, capid_t pt_entry, capid
 }
 
 int
-chal_pgtbl_cpy(struct captbl *t, capid_t cap_to, capid_t capin_to, struct cap_pgtbl *ctfrom, capid_t capin_from, cap_t cap_type, vaddr_t order)
+chal_pgtbl_cpy(struct captbl *t, capid_t cap_to, capid_t capin_to, struct cap_pgtbl *ctfrom, capid_t capin_from,
+               cap_t cap_type, vaddr_t order)
 {
-	struct cap_header	*ctto;
-	unsigned long		*f, old_v;
-	u32_t			flags;
+	struct cap_header *ctto;
+	unsigned long *    f, old_v;
+	u32_t              flags;
 
 	ctto = captbl_lkup(t, cap_to);
 	if (unlikely(!ctto)) return -ENOENT;
 	if (unlikely(ctto->type != cap_type)) return -EINVAL;
 	if (unlikely(((struct cap_pgtbl *)ctto)->refcnt_flags & CAP_MEM_FROZEN_FLAG)) return -EINVAL;
 
-	/* 
+	/*
 	 * See what kind of delegation we are doing. There are 4 kinds of delegations:
 	 * 1. Superpage -> Smallpage [order = 12]
 	 * 2. Superpage -> Superpage [order = 22]
@@ -780,33 +751,34 @@ chal_pgtbl_cpy(struct captbl *t, capid_t cap_to, capid_t capin_to, struct cap_pg
 	 * 4. Smallpage -> Superpage [prohibited]
 	 */
 	/* How big is the current page? */
-//printk("pgtbl %x capin_from %x order %d\n",((struct cap_pgtbl *)ctfrom)->pgtbl, capin_from, order);
-//	f = pgtbl_lkup_pgd(((struct cap_pgtbl *)ctfrom)->pgtbl, capin_from, &flags);
-//	if (!f) return -ENOENT;
-//	old_v = *f;
-//
-//	if (chal_pgtbl_flag_exist(old_v, PGTBL_SUPER)) {
-//		flags = chal_pgtbl_flag(old_v);
-//		if (order != SUPER_PAGE_ORDER) {
-//			/* We need to pick a subpage */
-//			old_v += EXTRACT_SUB_PAGE(capin_from);
-//			flags &= (~PGTBL_SUPER);
-//		} else {
-//			/* If we do superpage to superpage delegation, both addresses must be aligned to 4MB boundary */
-//			if ((EXTRACT_SUB_PAGE(capin_from) != 0) || (EXTRACT_SUB_PAGE(capin_to) != 0)) return -EINVAL;
-//		}
-//	} else {
-		if (order != PAGE_ORDER) return -EINVAL;
-		f = pgtbl_lkup_pte(((struct cap_pgtbl *)ctfrom)->pgtbl, capin_from, &flags);
-		flags = chal_pgtbl_flag_cos2nat_4K(flags);
-		if (!f) return -ENOENT;
-		old_v = *f;
-//	}
+	// printk("pgtbl %x capin_from %x order %d\n",((struct cap_pgtbl *)ctfrom)->pgtbl, capin_from, order);
+	//	f = pgtbl_lkup_pgd(((struct cap_pgtbl *)ctfrom)->pgtbl, capin_from, &flags);
+	//	if (!f) return -ENOENT;
+	//	old_v = *f;
+	//
+	//	if (chal_pgtbl_flag_exist(old_v, PGTBL_SUPER)) {
+	//		flags = chal_pgtbl_flag(old_v);
+	//		if (order != SUPER_PAGE_ORDER) {
+	//			/* We need to pick a subpage */
+	//			old_v += EXTRACT_SUB_PAGE(capin_from);
+	//			flags &= (~PGTBL_SUPER);
+	//		} else {
+	//			/* If we do superpage to superpage delegation, both addresses must be aligned to 4MB
+	// boundary */ 			if ((EXTRACT_SUB_PAGE(capin_from) != 0) || (EXTRACT_SUB_PAGE(capin_to) != 0))
+	// return -EINVAL;
+	//		}
+	//	} else {
+	if (order != PAGE_ORDER) return -EINVAL;
+	f     = pgtbl_lkup_pte(((struct cap_pgtbl *)ctfrom)->pgtbl, capin_from, &flags);
+	flags = chal_pgtbl_flag_cos2nat_4K(flags);
+	if (!f) return -ENOENT;
+	old_v = *f;
+	//	}
 
-//	printk("%d old_v %x\n",__LINE__, old_v);
+	//	printk("%d old_v %x\n",__LINE__, old_v);
 	/* Cannot copy frame, or kernel entry. */
 	if (chal_pgtbl_flag_exist(old_v, PGTBL_COSFRAME) || !chal_pgtbl_flag_exist(old_v, PGTBL_USER)) return -EPERM;
-//	printk("%d\n",__LINE__);
+	//	printk("%d\n",__LINE__);
 	return pgtbl_mapping_add(((struct cap_pgtbl *)ctto)->pgtbl, capin_to, old_v & PGTBL_FRAME_MASK, flags, order);
 }
 
@@ -819,9 +791,9 @@ chal_pgtbl_cpy(struct captbl *t, capid_t cap_to, capid_t capin_to, struct cap_pg
 int
 chal_pgtbl_cons(struct cap_captbl *ct, struct cap_captbl *ctsub, capid_t expandid, unsigned long depth)
 {
-	u32_t flags = 0, old_pte, new_pte, old_v, refcnt_flags;
-	unsigned long *    intern;
-	int                ret = 0;
+	u32_t          flags = 0, old_pte, new_pte, old_v, refcnt_flags;
+	unsigned long *intern;
+	int            ret = 0;
 
 	intern = pgtbl_lkup_lvl(((struct cap_pgtbl *)ct)->pgtbl, expandid, &flags, ct->lvl, depth);
 
@@ -838,11 +810,10 @@ chal_pgtbl_cons(struct cap_captbl *ct, struct cap_captbl *ctsub, capid_t expandi
 	ret = cos_cas((unsigned long *)&(((struct cap_pgtbl *)ctsub)->refcnt_flags), old_v, refcnt_flags);
 	if (ret != CAS_SUCCESS) return -ECASFAIL;
 
-	new_pte = (u32_t)chal_va2pa(
-	          (void *)((unsigned long)(((struct cap_pgtbl *)ctsub)->pgtbl) & PGTBL_FRAME_MASK))
+	new_pte = (u32_t)chal_va2pa((void *)((unsigned long)(((struct cap_pgtbl *)ctsub)->pgtbl) & PGTBL_FRAME_MASK))
 	          | CAV7_1M_INTERN_DEF;
 
-/* printk("expandid %x, depth %x, new_pte %x\n", expandid, depth, new_pte); */
+	/* printk("expandid %x, depth %x, new_pte %x\n", expandid, depth, new_pte); */
 
 	ret = cos_cas(intern, old_pte, new_pte);
 	if (ret != CAS_SUCCESS) {
@@ -856,10 +827,10 @@ chal_pgtbl_cons(struct cap_captbl *ct, struct cap_captbl *ctsub, capid_t expandi
 	return ret;
 }
 
-int 
+int
 chal_pgtbl_decons(struct cap_header *head, struct cap_header *sub, capid_t pruneid, unsigned long lvl)
 {
-	unsigned long *    intern, old_v;
+	unsigned long *intern, old_v;
 
 	struct cap_pgtbl *pt = (struct cap_pgtbl *)head;
 	u32_t             flags;
@@ -905,7 +876,7 @@ chal_pgtbl_introspect(struct cap_header *ch, vaddr_t addr)
 	return ret;
 }
 
-int 
+int
 chal_pgtbl_deact_pre(struct cap_header *ch, u32_t pa)
 {
 	struct cap_pgtbl *deact_cap = (struct cap_pgtbl *)ch;
@@ -962,18 +933,18 @@ void
 chal_pgtbl_update(pgtbl_t pt)
 {
 	/* Set TTBR0 to this. Rememberto VA2PA (va is passed in), and add the "0x4A" flag to it */
-	//printk("set pgtbl %x\n", pt);
+	// printk("set pgtbl %x\n", pt);
 	/* HACK OF ALL HACKS - STOP PMU ON SWITCHING TO OTHER COMPONENT - FAILURE. GOOD. */
-//	if(pt == 0x98003000 /* 80010000 */)
-//		__cos_cav7_pmcntenset_set(0x80000000UL);
-//	else
-//		__cos_cav7_pmcntenset_set(0x80000000UL);
+	//	if(pt == 0x98003000 /* 80010000 */)
+	//		__cos_cav7_pmcntenset_set(0x80000000UL);
+	//	else
+	//		__cos_cav7_pmcntenset_set(0x80000000UL);
 
-//	if(pt ==  0x98003000/* 0x80001000 */)
-//		__cos_cav7_pmcntenset_set(0x80000001UL);
-//	else
-//		__cos_cav7_pmcntenclr_set(0x00000001UL);
+	//	if(pt ==  0x98003000/* 0x80001000 */)
+	//		__cos_cav7_pmcntenset_set(0x80000001UL);
+	//	else
+	//		__cos_cav7_pmcntenclr_set(0x00000001UL);
 
-	__cos_cav7_ttbr0_set(chal_va2pa(pt)|0x4A);
+	__cos_cav7_ttbr0_set(chal_va2pa(pt) | 0x4A);
 	__cos_cav7_tlbiall_set(0);
 }

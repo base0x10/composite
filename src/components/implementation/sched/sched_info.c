@@ -13,8 +13,8 @@
 
 #define SCHED_MAX_CHILD_COMPS 8
 static struct sched_childinfo childinfo[NUM_CPU][SCHED_MAX_CHILD_COMPS];
-static unsigned int sched_num_child[NUM_CPU] CACHE_ALIGNED;
-static unsigned int sched_num_childsched[NUM_CPU] CACHE_ALIGNED;
+static unsigned int           sched_num_child[NUM_CPU] CACHE_ALIGNED;
+static unsigned int           sched_num_childsched[NUM_CPU] CACHE_ALIGNED;
 
 unsigned int self_init[NUM_CPU] CACHE_ALIGNED, num_child_init[NUM_CPU] CACHE_ALIGNED;
 
@@ -26,7 +26,7 @@ sched_childinfo_find(spdid_t id)
 {
 	unsigned int i;
 
-	for (i = 0; i < sched_num_child[cos_cpuid()]; i ++) {
+	for (i = 0; i < sched_num_child[cos_cpuid()]; i++) {
 		if (childinfo[cos_cpuid()][i].id == id) return &(childinfo[cos_cpuid()][i]);
 	}
 
@@ -36,7 +36,7 @@ sched_childinfo_find(spdid_t id)
 struct sched_childinfo *
 sched_childinfo_alloc(spdid_t id, compcap_t compcap, comp_flag_t flags)
 {
-	int idx = 0;
+	int                     idx = 0;
 	struct sched_childinfo *sci = NULL;
 	struct cos_defcompinfo *dci = NULL;
 
@@ -52,7 +52,7 @@ sched_childinfo_alloc(spdid_t id, compcap_t compcap, comp_flag_t flags)
 	} else {
 		cos_defcompinfo_childid_init(dci, id);
 	}
-	sci->id = id;
+	sci->id    = id;
 	sci->flags = flags;
 
 	return sci;
@@ -73,8 +73,8 @@ sched_num_childsched_get(void)
 static void
 sched_childinfo_init_intern(int is_raw)
 {
-	int remaining = 0;
-	spdid_t child;
+	int         remaining = 0;
+	spdid_t     child;
 	comp_flag_t childflags;
 
 	memset(childinfo[cos_cpuid()], 0, sizeof(struct sched_childinfo) * SCHED_MAX_CHILD_COMPS);
@@ -82,7 +82,7 @@ sched_childinfo_init_intern(int is_raw)
 	while ((remaining = hypercall_comp_child_next(cos_spd_id(), &child, &childflags)) >= 0) {
 		struct cos_defcompinfo *child_dci = NULL;
 		struct sched_childinfo *schedinfo = NULL;
-		struct sl_thd          *initthd   = NULL;
+		struct sl_thd *         initthd   = NULL;
 		compcap_t               compcap   = 0;
 
 		if (is_raw) {
@@ -96,13 +96,17 @@ sched_childinfo_init_intern(int is_raw)
 		hypercall_comp_cpubitmap_get(child, schedinfo->cpubmp);
 
 		if (bitmap_check(schedinfo->cpubmp, cos_cpuid())) {
-			PRINTLOG(PRINT_DEBUG, "Initializing child component %u, is_sched=%d\n", child, childflags & COMP_FLAG_SCHED);
-			initthd = sl_thd_initaep_alloc(child_dci, NULL, childflags & COMP_FLAG_SCHED, childflags & COMP_FLAG_SCHED ? 1 : 0, 0, 0, 0); /* TODO: rate information */
+			PRINTLOG(PRINT_DEBUG, "Initializing child component %u, is_sched=%d\n", child,
+			         childflags & COMP_FLAG_SCHED);
+			initthd = sl_thd_initaep_alloc(child_dci, NULL, childflags & COMP_FLAG_SCHED,
+			                               childflags & COMP_FLAG_SCHED ? 1 : 0, 0, 0,
+			                               0); /* TODO: rate information */
 			assert(initthd);
 			sched_child_initthd_set(schedinfo, initthd);
 
 			sched_child_init(schedinfo);
-			if (childflags & COMP_FLAG_SCHED) ps_faa((unsigned long *)&sched_num_childsched[cos_cpuid()], 1);
+			if (childflags & COMP_FLAG_SCHED)
+				ps_faa((unsigned long *)&sched_num_childsched[cos_cpuid()], 1);
 		}
 
 		if (!remaining) break;

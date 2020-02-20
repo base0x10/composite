@@ -28,7 +28,8 @@ void serial_init(void);
 #endif
 
 /* These numbers map directly to actual timers in the HPET */
-typedef enum {
+typedef enum
+{
 	TIMER_PERIODIC = 0,
 	TIMER_ONESHOT  = 1,
 } timer_type_t;
